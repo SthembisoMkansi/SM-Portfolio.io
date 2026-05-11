@@ -772,57 +772,66 @@
             color: var(--text-secondary);
         }
 
-        /* Skills Section */
-        .skills-section {
-            padding: 2rem 0;
-        }
+       /* Skill Table Styles */
+.skill-table {
+    margin-top: 1rem;
+}
 
-        .skill-category {
-            margin-bottom: 3rem;
-        }
+.skill-row {
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
 
-        .category-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
+.skill-row:last-child {
+    border-bottom: none;
+}
 
-        .category-icon {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.skill-cat-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.3px;
+}
 
-        .category-icon i {
-            font-size: 1.3rem;
-            color: var(--accent-primary);
-        }
+.skill-cat-title i {
+    margin-right: 0.3rem;
+}
 
-        .skill-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-        }
+.skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
 
-        .skill-tags span {
-            background: var(--bg-card);
-            padding: 0.5rem 1.2rem;
-            border-radius: 25px;
-            font-size: 0.85rem;
-            border: 1px solid var(--border-light);
-            transition: all 0.3s;
-        }
+.skill-tags span {
+    background: var(--bg-card);
+    padding: 0.4rem 1rem;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border-light);
+    transition: all 0.3s;
+    color: var(--text-secondary);
+}
 
-        .skill-tags span:hover {
-            background: var(--accent-primary);
-            color: white;
-            transform: translateY(-2px);
-        }
+.skill-tags span:hover {
+    background: var(--accent-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .skill-cat-title {
+        font-size: 0.75rem;
+    }
+    
+    .skill-tags span {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+    }
+}
 
         /* Contact Section */
         .contact-section {
@@ -1532,97 +1541,195 @@
 
 
    <!-- SKILLS PAGE -->
-    <div id="skills" class="page">
-        <section class="personal-statement" style="padding-top: 120px;">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-tag">Expertise</span>
-                    <h2>Technical <span class="gradient-text">Proficiencies</span></h2>
-                    <div class="section-divider"></div>
-                    <p class="section-subtitle">Comprehensive toolkit across the entire technology landscape</p>
-                </div>
-
-                <div class="skills-section">
-                    <div class="skill-category">
-                        <div class="category-header">
-                            <div class="category-icon"><i class="fas fa-chart-simple"></i></div>
-                            <h2>Business Analysis</h2>
-                        </div>
-                        <div class="skill-tags">
-                            <span>Business & Systems Analysis</span><span>Requirements Elicitation & Engineering</span><span>Gap Analysis</span>
-                            <span>Feasibility Studies</span><span>Use Case Development</span><span>Process Mapping (As-Is/To-Be)</span>
-                            <span>MoSCoW Prioritization</span><span>Customer Journey Mapping</span><span>Stakeholder Management</span>
-                            <span>Business Process Re-engineering</span><span>Cost-Benefit Analysis</span><span>Risk Assessment</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <div class="category-header">
-                            <div class="category-icon"><i class="fas fa-brain"></i></div>
-                            <h2>Data & AI</h2>
-                        </div>
-                        <div class="skill-tags">
-                            <span>Data Analysis</span><span>Machine Learning</span><span>Natural Language Processing (NLP)</span><span>Power BI</span>
-                            <span>Azure AI Engineer</span><span>LLM Development & Deployment</span><span>Azure Machine Learning</span><span>Python/PyTorch</span>
-                            <span>Azure Data Factory</span><span>Databricks</span><span>Apache Spark</span><span>Hadoop</span>
-                            <span>Airflow</span><span>JupyterLab</span><span>Model Performance Tuning</span><span>Responsible AI Practices</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <div class="category-header">
-                            <div class="category-icon"><i class="fas fa-code"></i></div>
-                            <h2>Programming Languages</h2>
-                        </div>
-                        <div class="skill-tags">
-                            <span>HTML5/CSS3</span><span>JavaScript (ES6+)</span><span>Node.JS</span><span>Java</span>
-                            <span>Python</span><span>SQL</span><span>PowerQuery (M Language)</span><span>R</span><span>PHP</span>
-                            <span>jQuery</span><span>AWS Lambda</span><span>TypeScript</span><span>Bash/Shell Scripting</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <div class="category-header">
-                            <div class="category-icon"><i class="fas fa-toolbox"></i></div>
-                            <h2>Frameworks, Libraries & Tools</h2>
-                        </div>
-                        <div class="skill-tags">
-                            <span>Jira/Confluence</span><span>QlikView</span><span>Microsoft Project</span><span>Microsoft Visio</span>
-                            <span>Figma</span><span>SAP Modules</span><span>Azure DevOps</span><span>Kanban</span>
-                            <span>SharePoint</span><span>Tableau</span><span>Oracle Database</span><span>MariaDB</span>
-                            <span>MySQL Server</span><span>R Studio</span><span>Selenium</span><span>Amazon Redshift</span>
-                            <span>Visual Studio Code</span><span>Eclipse IDE</span><span>Spyder</span><span>Anaconda Navigator</span>
-                            <span>Git/GitHub</span><span>Docker</span><span>Kubernetes</span><span>Postman</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <div class="category-header">
-                            <div class="category-icon"><i class="fas fa-project-diagram"></i></div>
-                            <h2>Process & Methodology</h2>
-                        </div>
-                        <div class="skill-tags">
-                            <span>Agile (Scrum/Kanban)</span><span>Waterfall</span><span>SAFe</span><span>Unified Modeling Language (UML)</span>
-                            <span>Business Process Model & Notation (BPMN)</span><span>Customer Journey Definitions</span><span>SDLC (Waterfall/Agile/Hybrid)</span>
-                            <span>ITIL Framework</span><span>Change Management</span><span>Continuous Integration/Continuous Deployment</span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category">
-                        <div class="category-header">
-                            <div class="category-icon"><i class="fas fa-cloud"></i></div>
-                            <h2>Cloud Platforms & Services</h2>
-                        </div>
-                        <div class="skill-tags">
-                            <span>Microsoft Azure (Core Services)</span><span>Amazon Web Services (AWS)</span><span>Azure Cognitive Services</span>
-                            <span>Azure Bot Services</span><span>Azure Functions (Serverless)</span><span>Azure Logic Apps</span>
-                            <span>Microsoft 365 / Power Platform</span><span>Google Cloud Platform (GCP - Basics)</span>
-                        </div>
-                    </div>
-                </div>
+<div id="skills" class="page">
+    <section class="personal-statement" style="padding-top: 120px;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Expertise</span>
+                <h2>Technical <span class="gradient-text">Proficiencies</span></h2>
+                <div class="section-divider"></div>
+                <p class="section-subtitle">Comprehensive toolkit across Business Analysis, AI, Development, Testing, and Project Management</p>
             </div>
-        </section>
-    </div>
+
+            <div class="skills-section">
+                
+                <!-- 📊 BUSINESS & TEST ANALYST -->
+                <div class="skill-category">
+                    <div class="category-header">
+                        <div class="category-icon"><i class="fas fa-chart-line"></i></div>
+                        <h2>📊 Business & Test Analyst</h2>
+                    </div>
+                    <div class="skill-table">
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Requirements & Documentation</div>
+                            <div class="skill-tags">
+                                <span>Jira</span><span>Confluence</span><span>MS Visio</span><span>Figma</span><span>Lucidchart</span><span>SharePoint</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Testing & QA</div>
+                            <div class="skill-tags">
+                                <span>Selenium</span><span>UAT</span><span>SIT</span><span>Batch Testing</span><span>Defect Tracking</span><span>Test Case Management</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Methodologies</div>
+                            <div class="skill-tags">
+                                <span>Agile (Scrum/Kanban)</span><span>Waterfall</span><span>BPMN</span><span>UML</span><span>SDLC</span><span>ITIL</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Business Analysis</div>
+                            <div class="skill-tags">
+                                <span>Gap Analysis</span><span>Feasibility Studies</span><span>Requirements Elicitation</span><span>Process Mapping (As-Is/To-Be)</span><span>MoSCoW</span><span>User Stories</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Data Validation</div>
+                            <div class="skill-tags">
+                                <span>SQL</span><span>Power Query</span><span>ETL Validation</span><span>Data Quality Dashboards</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🤖 AI & DATA SCIENCE -->
+                <div class="skill-category">
+                    <div class="category-header">
+                        <div class="category-icon"><i class="fas fa-brain"></i></div>
+                        <h2>🤖 AI & Data Science</h2>
+                    </div>
+                    <div class="skill-table">
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Machine Learning & AI</div>
+                            <div class="skill-tags">
+                                <span>Azure ML</span><span>LLMs</span><span>NLP</span><span>PyTorch</span><span>Python</span><span>Cognitive Services</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Data Analytics</div>
+                            <div class="skill-tags">
+                                <span>Power BI</span><span>Tableau</span><span>QlikView</span><span>Python (Pandas/NumPy)</span><span>R</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Data Engineering</div>
+                            <div class="skill-tags">
+                                <span>Azure Data Factory</span><span>Databricks</span><span>Apache Spark</span><span>Hadoop</span><span>Airflow</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 💻 DEVELOPMENT + IT PROJECT MANAGEMENT -->
+                <div class="skill-category">
+                    <div class="category-header">
+                        <div class="category-icon"><i class="fas fa-code"></i></div>
+                        <h2>💻 Development & IT Project Management</h2>
+                    </div>
+                    <div class="skill-table">
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Frontend Development</div>
+                            <div class="skill-tags">
+                                <span>HTML5</span><span>CSS3</span><span>JavaScript (ES6+)</span><span>React</span><span>jQuery</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Backend Development</div>
+                            <div class="skill-tags">
+                                <span>Node.js</span><span>Python</span><span>Java</span><span>PHP</span><span>AWS Lambda</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Databases</div>
+                            <div class="skill-tags">
+                                <span>SQL Server</span><span>MySQL</span><span>Oracle</span><span>MariaDB</span><span>Amazon Redshift</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Version Control</div>
+                            <div class="skill-tags">
+                                <span>Git</span><span>GitHub</span><span>Azure DevOps</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">IT Project Management</div>
+                            <div class="skill-tags">
+                                <span>Project Planning & Scheduling</span><span>Resource Allocation</span><span>Risk Management</span><span>Budgeting & Cost Control</span>
+                                <span>Stakeholder Communication</span><span>Agile/Scrum Leadership</span><span>Sprint Planning</span><span>Burndown Charts</span>
+                                <span>Velocity Tracking</span><span>Cross-functional Team Leadership</span><span>Vendor Management</span><span>Quality Assurance Oversight</span>
+                                <span>Change Management</span><span>Release Management</span><span>Post-implementation Reviews</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ☁️ CLOUD PLATFORMS -->
+                <div class="skill-category">
+                    <div class="category-header">
+                        <div class="category-icon"><i class="fas fa-cloud"></i></div>
+                        <h2>☁️ Cloud Platforms</h2>
+                    </div>
+                    <div class="skill-table">
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Microsoft Azure</div>
+                            <div class="skill-tags">
+                                <span>Azure ML</span><span>Data Factory</span><span>Functions</span><span>Cognitive Services</span><span>DevOps</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">AWS</div>
+                            <div class="skill-tags">
+                                <span>Lambda</span><span>Redshift</span><span>EC2</span><span>S3</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Other</div>
+                            <div class="skill-tags">
+                                <span>Docker</span><span>Kubernetes</span><span>Postman</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🛠️ TOOLS & FRAMEWORKS -->
+                <div class="skill-category">
+                    <div class="category-header">
+                        <div class="category-icon"><i class="fas fa-toolbox"></i></div>
+                        <h2>🛠️ Tools & Frameworks</h2>
+                    </div>
+                    <div class="skill-table">
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Project Management</div>
+                            <div class="skill-tags">
+                                <span>Jira</span><span>Confluence</span><span>MS Project</span><span>Trello</span><span>Kanban</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Testing</div>
+                            <div class="skill-tags">
+                                <span>Selenium</span><span>TestNG</span><span>JUnit</span><span>Postman</span><span>LoadRunner</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">Design & Prototyping</div>
+                            <div class="skill-tags">
+                                <span>Figma</span><span>Adobe Photoshop</span><span>MS Visio</span>
+                            </div>
+                        </div>
+                        <div class="skill-row">
+                            <div class="skill-cat-title">IDE & Notebooks</div>
+                            <div class="skill-tags">
+                                <span>VS Code</span><span>Eclipse</span><span>JupyterLab</span><span>Spyder</span><span>RStudio</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
 
     <!-- CONTACT PAGE -->
     <div id="contact" class="page">
