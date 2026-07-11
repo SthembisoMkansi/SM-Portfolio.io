@@ -52,6 +52,15 @@ I'm a **self-driven, resourceful technologist** with **7+ years of IT experience
 - ✅ **Certificate showcase** with credential details
 - ✅ **Live social links** (LinkedIn & GitHub)
 
+## 🎨 Features of the AI Agent
+Feature	Description
+- ✅ Knowledge Base	Answers about skills, experience, certifications, projects, education
+- ✅ Quick Reply Buttons	5 pre-set questions for easy access
+- ✅ Typing Animation	Shows "thinking" effect before responding
+- ✅ Dark/Light Mode	Adapts to your site's theme
+- ✅ Mobile Responsive	Full-width on small screens
+- ✅ Floating Toggle	Opens/closes chat window
+
 ## 🔗 Quick Links
 
 | Platform | Link |
