@@ -1,1901 +1,413 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sthembiso Mkansi | AI & Business Intelligence Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #111111;
-            --bg-card: #1a1a1a;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
-            --text-muted: #6b6b6b;
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
-            --accent-tertiary: #d946ef;
-            --border-light: rgba(255, 255, 255, 0.08);
-            --gradient-1: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
-            --gradient-2: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
+<!-- ===== AI AGENT CHATBOT ===== -->
+<style>
+    /* Chat Widget */
+    .chat-widget {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        z-index: 9999;
+        font-family: 'Inter', sans-serif;
+    }
+    .chat-toggle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
+        border: none;
+        color: #fff;
+        font-size: 28px;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: auto;
+    }
+    .chat-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 12px 32px rgba(99,102,241,0.6);
+    }
+    .chat-window {
+        display: none;
+        width: 360px;
+        max-width: 90vw;
+        background: var(--bg-card, #1a1a1a);
+        border-radius: 20px;
+        border: 1px solid var(--border-light, rgba(255,255,255,0.08));
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        margin-bottom: 16px;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        max-height: 500px;
+        transition: all 0.3s;
+    }
+    .chat-window.open {
+        display: flex;
+    }
+    .chat-header {
+        padding: 16px 20px;
+        background: rgba(99,102,241,0.15);
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .chat-header .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1, #d946ef);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #fff;
+    }
+    .chat-header .info h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary, #fff);
+    }
+    .chat-header .info p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--text-muted, #6b6b6b);
+    }
+    .chat-header .close-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 20px;
+        cursor: pointer;
+        margin-left: auto;
+        padding: 0 4px;
+    }
+    .chat-body {
+        flex: 1;
+        padding: 16px 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 320px;
+        background: var(--bg-primary, #0a0a0a);
+    }
+    .chat-body .message {
+        max-width: 85%;
+        padding: 10px 14px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.5;
+        animation: fadeInUp 0.3s ease;
+    }
+    .chat-body .message.bot {
+        background: var(--bg-elevated, #2a2a2a);
+        color: var(--text-secondary, #d0d0d0);
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+    }
+    .chat-body .message.user {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+    }
+    .chat-body .typing-indicator {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        background: var(--bg-elevated, #2a2a2a);
+        border-radius: 20px;
+        align-self: flex-start;
+    }
+    .chat-body .typing-indicator span {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #8b5cf6;
+        animation: typingBounce 1.2s infinite;
+    }
+    .chat-body .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .chat-body .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-6px); }
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .chat-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border-light);
+        display: flex;
+        gap: 8px;
+        background: var(--bg-card);
+    }
+    .chat-footer input {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid var(--border-light);
+        border-radius: 30px;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 14px;
+        outline: none;
+        transition: border 0.3s;
+    }
+    .chat-footer input:focus {
+        border-color: #6366f1;
+    }
+    .chat-footer input::placeholder {
+        color: var(--text-muted);
+    }
+    .chat-footer button {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 30px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.3s;
+        font-size: 14px;
+    }
+    .chat-footer button:hover {
+        opacity: 0.85;
+    }
+    .quick-replies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 0 16px 10px 16px;
+        background: var(--bg-primary);
+        border-top: 1px solid var(--border-light);
+    }
+    .quick-replies button {
+        background: rgba(99,102,241,0.15);
+        border: 1px solid rgba(99,102,241,0.3);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .quick-replies button:hover {
+        background: rgba(99,102,241,0.3);
+        color: #fff;
+    }
+    @media (max-width: 480px) {
+        .chat-window {
             width: 100%;
-            z-index: 1000;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            cursor: pointer;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links button {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: color 0.3s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .nav-links button:hover,
-        .nav-links button.active {
-            color: var(--accent-primary);
-        }
-
-        .theme-toggle {
-            background: transparent;
-            border: 1px solid var(--border-light);
-            color: var(--text-primary);
-            padding: 0.5rem;
-            border-radius: 50%;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            font-size: 1.2rem;
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .hamburger span {
-            width: 25px;
-            height: 2px;
-            background: white;
-            transition: 0.3s;
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            padding-top: 80px;
-        }
-
-        .hero-bg {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-        }
-
-        .gradient-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.3;
-            animation: float 20s infinite ease-in-out;
-        }
-
-        .orb-1 {
-            width: 500px;
-            height: 500px;
-            background: var(--accent-primary);
-            top: -200px;
-            right: -100px;
-        }
-
-        .orb-2 {
-            width: 400px;
-            height: 400px;
-            background: var(--accent-secondary);
-            bottom: -150px;
-            left: -100px;
-            animation-delay: -5s;
-        }
-
-        .orb-3 {
-            width: 300px;
-            height: 300px;
-            background: var(--accent-tertiary);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -10s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            33% { transform: translate(30px, -30px); }
-            66% { transform: translate(-20px, 20px); }
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Page Content */
-        .page {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .page.active-page {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Hero Grid */
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid var(--border-light);
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            margin-bottom: 1.5rem;
-        }
-
-        .badge-pulse {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .hero-title {
-            font-size: 4rem;
-            font-weight: 700;
-            font-family: 'Playfair Display', serif;
-            margin-bottom: 1rem;
-        }
-
-        .gradient-text {
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .hero-typed {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .typed-prefix {
-            color: var(--text-secondary);
-        }
-
-        .typed-text {
-            color: var(--accent-primary);
-            font-weight: 600;
-        }
-
-        .typed-cursor {
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        .hero-description {
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            max-width: 500px;
-        }
-
-        .hero-stats {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-primary);
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.9rem 2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            cursor: pointer;
-            border: none;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn.primary {
-            background: var(--gradient-1);
-            color: white;
-        }
-
-        .btn.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn.secondary {
-            background: transparent;
-            border: 2px solid var(--border-light);
-            color: var(--text-primary);
-        }
-
-        .btn.secondary:hover {
-            border-color: var(--accent-primary);
-        }
-
-        .profile-frame {
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border-light);
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .profile-initials {
-            font-size: 8rem;
-            font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .tech-stack {
-            position: absolute;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 1rem;
-            background: var(--bg-card);
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            border: 1px solid var(--border-light);
-        }
-
-        .tech-stack i {
-            font-size: 1.5rem;
-            color: var(--accent-primary);
-        }
-
-        /* Section Styles */
-        .section-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .section-tag {
-            display: inline-block;
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--accent-primary);
-            padding: 0.3rem 1rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-        }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .section-divider {
-            width: 60px;
-            height: 3px;
-            background: var(--gradient-1);
-            margin: 1rem auto 0;
-        }
-
-        .section-subtitle {
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-        }
-
-        /* Personal Statement */
-        .personal-statement {
-            padding: 6rem 0;
-            background: var(--bg-secondary);
-        }
-
-        .statement-card {
-            position: relative;
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 3rem;
-            border: 1px solid var(--border-light);
-        }
-
-        .quote-icon {
-            position: absolute;
-            top: -20px;
-            left: 30px;
-            font-size: 3rem;
-            color: var(--accent-primary);
-            opacity: 0.3;
-        }
-
-        .statement-card p {
-            margin-bottom: 1rem;
-            color: var(--text-secondary);
-        }
-
-        /* Expertise Grid */
-        .expertise-preview {
-            padding: 6rem 0;
-        }
-
-        .expertise-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-
-        .expertise-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 2rem;
-            border: 1px solid var(--border-light);
-            transition: all 0.3s;
-        }
-
-        .expertise-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-primary);
-        }
-
-        .card-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .card-icon i {
-            font-size: 1.8rem;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .expertise-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .expertise-card p {
-            color: var(--text-secondary);
-        }
-
-        /* Timeline */
-        .timeline-wrapper {
-            position: relative;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .timeline-line {
-            position: absolute;
-            left: 30px;
-            top: 0;
+            max-width: 100vw;
+            right: 0;
             bottom: 0;
-            width: 2px;
-            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary), transparent);
+            border-radius: 20px 20px 0 0;
+            max-height: 80vh;
         }
-
-        .timeline-item {
-            position: relative;
-            padding-left: 80px;
-            margin-bottom: 4rem;
+        .chat-widget {
+            bottom: 20px;
+            right: 16px;
         }
-
-        .timeline-marker {
-            position: absolute;
-            left: 20px;
-            top: 0;
+        .chat-toggle {
+            width: 56px;
+            height: 56px;
+            font-size: 24px;
         }
-
-        .marker-dot {
-            width: 20px;
-            height: 20px;
-            background: var(--accent-primary);
-            border-radius: 50%;
-            border: 3px solid var(--bg-primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-            transition: all 0.3s;
-        }
-
-        .timeline-item:hover .marker-dot {
-            transform: scale(1.2);
-        }
-
-        .timeline-content {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-light);
-        }
-
-        .timeline-date {
-            color: var(--accent-primary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-content h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .timeline-content h4 {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-            font-weight: 400;
-        }
-
-        .timeline-content p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .timeline-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .timeline-tags span {
-            background: rgba(99, 102, 241, 0.1);
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            color: var(--accent-primary);
-        }
-
-        /* Cert Grid */
-        .cert-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem 0;
-        }
-
-        .cert-card {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 2rem;
-            text-align: center;
-            border: 1px solid var(--border-light);
-            transition: all 0.3s;
-        }
-
-        .cert-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .cert-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-        }
-
-        .cert-icon i {
-            font-size: 2rem;
-            color: var(--accent-primary);
-        }
-
-        .cert-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .cert-card p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .cert-badge {
-            display: inline-block;
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-        }
-
-        /* Experience Items */
-        .exp-item {
-            background: var(--bg-card);
-            margin-bottom: 2rem;
-            padding: 1.8rem;
-            border-radius: 16px;
-            border: 1px solid var(--border-light);
-            transition: all 0.3s;
-        }
-
-        .exp-item:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent-primary);
-        }
-
-        .exp-header {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .exp-header h3 {
-            font-size: 1.3rem;
-        }
-
-        .company {
-            color: var(--accent-primary);
-            font-weight: 500;
-        }
-
-        .exp-date {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        .exp-duties {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .exp-duties li {
-            margin-bottom: 0.5rem;
-            padding-left: 1.5rem;
-            position: relative;
-            color: var(--text-secondary);
-        }
-
-        .exp-duties li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--accent-primary);
-        }
-
-        .highlight {
-            color: var(--accent-primary);
-            font-weight: 700;
-        }
-
-        .exp-tech {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-light);
-        }
-
-        .exp-tech span {
-            background: rgba(99, 102, 241, 0.08);
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        /* Projects Grid */
-        .projects-grid {
-            padding: 2rem 0;
-        }
-
-        .project-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--border-light);
-            transition: all 0.3s;
-        }
-
-        .project-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-primary);
-        }
-
-        .project-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            color: white;
-            padding: 0.25rem 1rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .project-badge.freelance {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
-        }
-
-        .project-badge.volunteer {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-        }
-
-        .project-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .project-date {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-        }
-
-        .project-card p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .project-tech {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .project-tech span {
-            background: rgba(99, 102, 241, 0.08);
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-       /* Skill Table Styles */
-.skill-table {
-    margin-top: 1rem;
-}
-
-.skill-row {
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border-light);
-}
-
-.skill-row:last-child {
-    border-bottom: none;
-}
-
-.skill-cat-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--accent-primary);
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.3px;
-}
-
-.skill-cat-title i {
-    margin-right: 0.3rem;
-}
-
-.skill-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-}
-
-.skill-tags span {
-    background: var(--bg-card);
-    padding: 0.4rem 1rem;
-    border-radius: 25px;
-    font-size: 0.8rem;
-    border: 1px solid var(--border-light);
-    transition: all 0.3s;
-    color: var(--text-secondary);
-}
-
-.skill-tags span:hover {
-    background: var(--accent-primary);
-    color: white;
-    transform: translateY(-2px);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .skill-cat-title {
-        font-size: 0.75rem;
     }
-    
-    .skill-tags span {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.8rem;
-    }
-}
+</style>
 
-        /* Contact Section */
-        .contact-section {
-            padding: 2rem 0;
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-        }
-
-        .contact-info, .references {
-            background: var(--bg-card);
-            padding: 2rem;
-            border-radius: 16px;
-            border: 1px solid var(--border-light);
-        }
-
-        .contact-info h2, .references h2 {
-            margin-bottom: 1.5rem;
-        }
-
-        .contact-detail {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .contact-icon-wrapper {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .contact-icon-wrapper i {
-            font-size: 1.2rem;
-            color: var(--accent-primary);
-        }
-
-        .contact-detail a {
-            color: var(--text-primary);
-            text-decoration: none;
-        }
-
-        .contact-detail a:hover {
-            color: var(--accent-primary);
-        }
-
-        .ref-card {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .ref-icon {
-            width: 45px;
-            height: 45px;
-            background: rgba(99, 102, 241, 0.1);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .ref-icon i {
-            font-size: 1.2rem;
-            color: var(--accent-primary);
-        }
-
-        .ref-content h3 {
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .ref-title {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .ref-phone {
-            font-size: 0.8rem;
-            color: var(--accent-primary);
-            margin-top: 0.25rem;
-        }
-
-        .availability-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(16, 185, 129, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            margin-top: 1rem;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-light);
-            padding: 4rem 0 2rem;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer-brand p {
-            color: var(--text-secondary);
-            margin-top: 1rem;
-        }
-
-        .footer-links h4, .footer-social h4 {
-            margin-bottom: 1rem;
-        }
-
-        .footer-links ul {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-links button {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: color 0.3s;
-        }
-
-        .footer-links button:hover {
-            color: var(--accent-primary);
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .social-icons a {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .social-icons a:hover {
-            background: var(--gradient-1);
-            color: white;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-light);
-            color: var(--text-muted);
-        }
-
-        .footer-bottom i {
-            color: #ef4444;
-        }
-
-        /* Responsive */
-        @media (max-width: 968px) {
-            .hero-grid {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            
-            .hero-description {
-                margin: 0 auto 2rem;
-            }
-            
-            .hero-stats {
-                justify-content: center;
-            }
-            
-            .hero-buttons {
-                justify-content: center;
-            }
-            
-            .profile-frame {
-                width: 300px;
-                height: 300px;
-            }
-            
-            .profile-initials {
-                font-size: 5rem;
-            }
-            
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .contact-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: var(--bg-primary);
-                flex-direction: column;
-                padding: 2rem;
-                gap: 1rem;
-                text-align: center;
-                border-bottom: 1px solid var(--border-light);
-            }
-            
-            .nav-links.active {
-                display: flex;
-            }
-            
-            .hamburger {
-                display: flex;
-            }
-            
-            .section-header h2 {
-                font-size: 2rem;
-            }
-
-            .timeline-item {
-                padding-left: 60px;
-            }
-
-            .timeline-marker {
-                left: 10px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-<nav>
-    <div class="nav-container">
-        <div class="logo" onclick="showPage('home')">SM</div>
-        <ul class="nav-links">
-            <li><button class="nav-btn active" data-page="home">Home</button></li>
-            <li><button class="nav-btn" data-page="education">Education</button></li>
-            <li><button class="nav-btn" data-page="experience">Experience</button></li>
-            <li><button class="nav-btn" data-page="projects">Projects</button></li>
-            <li><button class="nav-btn" data-page="skills">Skills</button></li>
-            <li><button class="nav-btn" data-page="contact">Contact</button></li>
-        </ul>
-        <div class="nav-actions">
-            <button class="theme-toggle" id="themeToggle">🌙</button>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
+<div class="chat-widget">
+    <!-- Chat Window -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="avatar">🤖</div>
+            <div class="info">
+                <h4>AI Career Assistant</h4>
+                <p>Ask me about Sthembiso</p>
+            </div>
+            <button class="close-btn" id="closeChat">✕</button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="message bot">👋 Hello! I'm the AI assistant for Sthembiso's portfolio. Ask me about his skills, experience, certifications, or projects!</div>
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span><span></span><span></span>
             </div>
         </div>
-    </div>
-</nav>
-
-<main>
-    <!-- HOME PAGE -->
-    <div id="home" class="page active-page">
-        <section class="hero">
-            <div class="hero-bg">
-                <div class="gradient-orb orb-1"></div>
-                <div class="gradient-orb orb-2"></div>
-                <div class="gradient-orb orb-3"></div>
-            </div>
-            <div class="container">
-                <div class="hero-grid">
-                    <div class="hero-content">
-                        <div class="hero-badge">
-                            <span class="badge-pulse"></span>
-                            <span>7+ Years of Excellence</span>
-                        </div>
-                        <h1 class="hero-title">
-                            Sthembiso <span class="gradient-text">Mkansi</span>
-                        </h1>
-                        <div class="hero-typed">
-                            <span class="typed-prefix">I'm a </span>
-                            <span class="typed-text" id="typedText"></span>
-                            <span class="typed-cursor">|</span>
-                        </div>
-                        <p class="hero-description">
-                            A self-driven Business Analyst, Test Analyst, AI Engineer, IT Project Manager and Full-Stack Developer 
-                            bridging the gap between business strategy and technical innovation.
-                        </p>
-                        <div class="hero-stats">
-                            <div class="stat">
-                                <span class="stat-number">7+</span>
-                                <span class="stat-label">Years Experience</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-number">5+</span>
-                                <span class="stat-label">Projects Delivered</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-number">98%</span>
-                                <span class="stat-label">Success Rate</span>
-                            </div>
-                        </div>
-                        <div class="hero-buttons">
-                            <button class="btn primary" onclick="showPage('contact')">Let's Connect →</button>
-                            <button class="btn secondary" onclick="showPage('experience')">View Experience</button>
-                        </div>
-                    </div>
-                    <div class="hero-visual">
-                        <div class="profile-frame">
-                            <div class="profile-initials">SM</div>
-                            <div class="tech-stack">
-                                <i class="fab fa-python"></i>
-                                <i class="fab fa-js"></i>
-                                <i class="fas fa-database"></i>
-                                <i class="fab fa-aws"></i>
-                                <i class="fas fa-cloud"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="personal-statement">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-tag">About Me</span>
-                    <h2>Driving Innovation Through<br><span class="gradient-text">Data & Technology</span></h2>
-                    <div class="section-divider"></div>
-                </div>
-                <div class="statement-card">
-                    <div class="quote-icon">"</div>
-                    <p>A self-driven and resourceful Business Analyst, Project Manager, Test Analyst, Developer, Data Analyst and Data Scientist with over <strong>7 years of IT experience</strong> in full Software Development Lifecycle (SDLC). Skilled in eliciting and translating business requirements into actionable solutions using Agile, SCRUM, and Waterfall methodologies.</p>
-                    <p>Proven expertise in frontend/backend development, data analysis, and process optimization, with a track record of delivering high-impact web applications and business systems. Adept at stakeholder management, bridging communication gaps between business and technical teams, and driving project success under fixed costs and deadlines.</p>
-                    <p style="margin-top: 1rem;">My approach combines technical excellence with business acumen. I don't just build solutions—I solve problems. Whether it's automating ETL workflows, deploying LLM models for credit risk analysis, or leading Agile teams through complex integrations, I focus on delivering measurable business value.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="expertise-preview">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-tag">Core Expertise</span>
-                    <h2>What I Bring to the Table</h2>
-                    <div class="section-divider"></div>
-                </div>
-                <div class="expertise-grid">
-                    <div class="expertise-card">
-                        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
-                        <h3>Business Analysis</h3>
-                        <p>Requirements elicitation, gap analysis, process mapping, and stakeholder management for optimal business outcomes.</p>
-                    </div>
-                    <div class="expertise-card">
-                        <div class="card-icon"><i class="fas fa-brain"></i></div>
-                        <h3>AI & Data Science</h3>
-                        <p>Machine learning, LLM deployment, NLP, and advanced analytics using Azure AI and Python ecosystems.</p>
-                    </div>
-                    <div class="expertise-card">
-                        <div class="card-icon"><i class="fas fa-code"></i></div>
-                        <h3>Full-Stack Development</h3>
-                        <p>End-to-end web applications with modern frameworks, responsive design, and cloud integration.</p>
-                    </div>
-                    <div class="expertise-card">
-                        <div class="card-icon"><i class="fas fa-project-diagram"></i></div>
-                        <h3>Project Management</h3>
-                        <p>Agile, Scrum, and Waterfall methodologies ensuring on-time, on-budget delivery.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-      <!-- EDUCATION PAGE - ENHANCED WITH CERTIFICATE DETAILS -->
-    <div id="education" class="page">
-        <section class="personal-statement" style="padding-top: 120px;">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-tag">Education & Credentials</span>
-                    <h2>Education & <span class="gradient-text">Certifications</span></h2>
-                    <div class="section-divider"></div>
-                    <p class="section-subtitle">My academic foundation and professional certifications that validate my expertise</p>
-                </div>
-                
-                <div class="timeline-wrapper">
-                    <div class="timeline-line"></div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-marker"><div class="marker-dot"></div></div>
-                        <div class="timeline-content">
-                            <div class="timeline-date">2016 — 2018</div>
-                            <h3>Bachelor of Information Technology</h3>
-                            <h4>Business Systems • RoseBank College IIE</h4>
-                            <p>Comprehensive study of IT business systems, software development, database management, and business process integration. Graduated with distinction in core modules including Systems Analysis, Database Design, and Project Management. This foundation equipped me with the technical and analytical skills necessary for modern business technology challenges.</p>
-                            <div class="timeline-tags">
-                                <span>IT Systems</span>
-                                <span>Business Process</span>
-                                <span>Database Design</span>
-                                <span>Software Development</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="timeline-marker"><div class="marker-dot"></div></div>
-                        <div class="timeline-content">
-                            <div class="timeline-date">2021 — 2022</div>
-                            <h3>Diploma in Business Analysis</h3>
-                            <h4>Gijima Training Institute</h4>
-                           <p>Specialized training in requirements engineering, stakeholder management, business process optimization, and Agile methodologies. Hands-on experience with industry-standard tools and frameworks including Jira, Confluence, and various modeling techniques. This program sharpened my ability to bridge the communication gap between business stakeholders and technical teams.</p>
-                            <div class="timeline-tags">
-                                <span>Requirements Elicitation</span>
-                                <span>UML</span>
-                                <span>BPMN</span>
-                                <span>Agile Methodologies</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ENHANCED CERTIFICATIONS SECTION -->
-                <div class="section-header" style="margin-top: 3rem;">
-                    <span class="section-tag">Professional Validation</span>
-                    <h2>Certifications &<br><span class="gradient-text">Areas of Mastery</span></h2>
-                    <div class="section-divider"></div>
-                </div>
-
-                <div class="cert-grid">
-                    <!-- Microsoft Azure AI Fundamentals -->
-                    <div class="cert-card">
-                        <div class="cert-icon"><i class="fab fa-microsoft"></i></div>
-                        <h3>Microsoft Certified: Azure AI Fundamentals</h3>
-                        <div class="cert-details">
-                            <p><strong>Credential ID:</strong> 4C77AB9137B4D35A</p>
-                            <p><strong>Certification Number:</strong> 5F84A6-E02AKC</p>
-                            <p><strong>Earned:</strong> April 8, 2022</p>
-                            <p><strong>Issuer:</strong> Microsoft</p>
-                        </div>
-                        <div class="cert-badge"><i class="fas fa-certificate"></i> Active Certification</div>
-                        <div class="cert-image">
-                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%231a1a1a'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%236366f1' font-size='14' font-family='Arial'%3EMicrosoft Azure AI Fundamentals Certificate%3C/text%3E%3C/svg%3E" alt="Azure AI Fundamentals Certificate">
-                        </div>
-                        <div class="cert-skills">
-                            <span>AI Concepts</span>
-                            <span>Machine Learning</span>
-                            <span>Azure Services</span>
-                            <span>Computer Vision</span>
-                            <span>NLP</span>
-                        </div>
-                        <p>This certification demonstrates understanding of AI workloads, machine learning principles, computer vision, natural language processing, and responsible AI practices on Azure. Prior experience in data science or software engineering is not required—this certification validates foundational knowledge accessible to both technical and non-technical professionals.</p>
-                    </div>
-
-                    <!-- Microsoft Azure AI Engineer Associate -->
-                    <div class="cert-card">
-                        <div class="cert-icon"><i class="fab fa-microsoft"></i></div>
-                        <h3>Microsoft Certified: Azure AI Engineer Associate</h3>
-                        <div class="cert-details">
-                            <p><strong>Credential ID:</strong> FD523497A7B5E535</p>
-                            <p><strong>Certification Number:</strong> D3P75A-BA417A</p>
-                            <p><strong>Earned:</strong> May 5, 2022</p>
-                            <p><strong>Expires:</strong> May 6, 2027</p>
-                            <p><strong>Issuer:</strong> Microsoft</p>
-                        </div>
-                        <div class="cert-badge"><i class="fas fa-certificate"></i> Active through 2027</div>
-                        <div class="cert-image">
-                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%231a1a1a'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%236366f1' font-size='14' font-family='Arial'%3EMicrosoft Azure AI Engineer Certificate%3C/text%3E%3C/svg%3E" alt="Azure AI Engineer Certificate">
-                        </div>
-                        <div class="cert-skills">
-                            <span>Azure AI Development</span>
-                            <span>LLM Deployment</span>
-                            <span>Azure ML</span>
-                            <span>Cognitive Services</span>
-                            <span>Model Management</span>
-                        </div>
-                        <p><strong>As an Azure AI Engineer, I build, manage, and deploy AI solutions that leverage Azure AI.</strong> My responsibilities include requirements definition and design, development, deployment, integration, maintenance, performance tuning, and monitoring of AI solutions. This advanced certification validates my ability to implement AI solutions end-to-end using Azure AI services.</p>
-                    </div>
-
-                    <!-- Project Management Certificate -->
-                    <div class="cert-card">
-                        <div class="cert-icon"><i class="fas fa-tasks"></i></div>
-                        <h3>Project Management Certificate</h3>
-                        <div class="cert-details">
-                            <p><strong>ID Nr:</strong> 9604305579088</p>
-                            <p><strong>Issued:</strong> March 4, 2026</p>
-                            <p><strong>Issuer:</strong> National School of Government</p>
-                            <p><strong>Programme:</strong> SMS Essentials Programme</p>
-                        </div>
-                        <div class="cert-badge"><i class="fas fa-certificate"></i> Verified</div>
-                        <div class="cert-image">
-                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%231a1a1a'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%236366f1' font-size='14' font-family='Arial'%3EProject Management Certificate%3C/text%3E%3C/svg%3E" alt="Project Management Certificate">
-                        </div>
-                        <div class="cert-skills">
-                            <span>SMS Essentials</span>
-                            <span>Middle Management</span>
-                            <span>Project Governance</span>
-                            <span>Strategic Planning</span>
-                        </div>
-                        <p><strong>This certificate is part of the SMS Essentials Programme, which consists of six comprehensive courses.</strong> The programme is intended for both middle and senior managers. Participation provides middle managers with learning opportunities to develop essential management and leadership competencies. This training enhances my ability to lead projects effectively within organizational frameworks.</p>
-                    </div>
-                </div>
-
-                <!-- Additional Knowledge Areas Section -->
-                <div style="margin-top: 3rem; background: var(--bg-card); border-radius: 20px; padding: 2rem; border: 1px solid var(--border-light);">
-                    <h3 style="text-align: center; margin-bottom: 1.5rem;">Continuous Learning & Professional Development</h3>
-                    <p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem;">My certifications reflect a commitment to staying current with emerging technologies and management practices. The Microsoft certification pathway demonstrates expertise in cloud-based AI solutions, while the Project Management credential from the National School of Government validates my leadership and organizational capabilities. Together, they enable me to deliver comprehensive, enterprise-ready solutions that align technical innovation with business strategy.</p>
-                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 1rem;">
-                        <span style="background: rgba(99,102,241,0.1); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.85rem;">🤖 AI Solution Architecture</span>
-                        <span style="background: rgba(99,102,241,0.1); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.85rem;">📊 Data Engineering</span>
-                        <span style="background: rgba(99,102,241,0.1); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.85rem;">🎯 Strategic Management</span>
-                        <span style="background: rgba(99,102,241,0.1); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.85rem;">☁️ Cloud Computing</span>
-                        <span style="background: rgba(99,102,241,0.1); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.85rem;">🔍 Business Intelligence</span>
-                        <span style="background: rgba(99,102,241,0.1); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.85rem;">📈 Performance Monitoring</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-     <!-- EXPERIENCE PAGE -->
-    <div id="experience" class="page">
-        <section class="personal-statement" style="padding-top: 120px;">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-tag">Career Timeline</span>
-                    <h2>Professional <span class="gradient-text">Experience</span></h2>
-                    <div class="section-divider"></div>
-                    <p class="section-subtitle">7+ years of delivering measurable business impact through technology</p>
-                </div>
-
-                <div class="exp-item">
-                    <div class="exp-header">
-                        <div>
-                            <h3>IT Enabler</h3>
-                            <p class="company">Edu Nova</p>
-                        </div>
-                        <div class="exp-date"><i class="far fa-calendar-alt"></i> November 2025 - Current</div>
-                    </div>
-                    <ul class="exp-duties">
-                        <li>Provide specialist expertise in digital tool adoption, promoting innovation and continuous learning in educational environment</li>
-                        <li>Support educators in utilizing digital tools, run coding clubs for 20+ learners, fostering digital literacy from an early age</li>
-                        <li>Provide AI fluency training to promote digital literacy and innovation across all staff levels</li>
-                        <li>Initiate and plan value-added process improvements in digital resource governance and administration</li>
-                        <li>Develop and maintain productive working relationships with educators, learners, and administrators to achieve predefined digital literacy objectives</li>
-                    </ul>
-                    <div class="exp-tech">
-                        <span>Digital Transformation</span>
-                        <span>AI Literacy</span>
-                        <span>Process Improvement</span>
-                        <span>Stakeholder Management</span>
-                        <span>Educational Technology</span>
-                    </div>
-                </div>
-
-                <div class="exp-item">
-                    <div class="exp-header">
-                        <div>
-                            <h3>Test Analyst</h3>
-                            <p class="company">African Bank (InfyStrat Software Solutions)</p>
-                        </div>
-                        <div class="exp-date"><i class="far fa-calendar-alt"></i> August 2023 - May 2024</div>
-                    </div>
-                    <ul class="exp-duties">
-                        <li>Automated ETL workflows using SQL, Python, and Azure Data Factory, reducing manual processing time by <span class="highlight">25%</span> and accelerating trade finance reporting</li>
-                        <li>Executed <span class="highlight">200+ test cases</span> across UAT, SIT, and batch testing environments, identifying <span class="highlight">45+ critical defects</span> with <span class="highlight">98% defect detection rate</span> before production deployment</li>
-                        <li>Developed and deployed LLM solution on Azure ML for credit risk analysis, enabling data-driven decision-making that improved risk prediction accuracy by <span class="highlight">15%</span></li>
-                        <li>Designed Power Query scripts and Power BI dashboards to support financial audits, reducing report generation time by <span class="highlight">30%</span> and providing real-time insights to stakeholders</li>
-                        <li>Implemented data quality dashboards with alert mechanisms, proactively identifying and resolving anomalies, which decreased data reconciliation errors by <span class="highlight">20%</span></li>
-                    </ul>
-                    <div class="exp-tech">
-                        <span>SQL</span><span>Python</span><span>Azure Data Factory</span><span>Power BI</span><span>Azure ML</span><span>LLM</span><span>ETL Automation</span>
-                    </div>
-                </div>
-
-                <div class="exp-item">
-                    <div class="exp-header">
-                        <div>
-                            <h3>Junior Business Analyst</h3>
-                            <p class="company">Absa Bank</p>
-                        </div>
-                        <div class="exp-date"><i class="far fa-calendar-alt"></i> August 2021 - August 2022</div>
-                    </div>
-                    <ul class="exp-duties">
-                        <li>Led requirements analysis and system integration for <span class="highlight">3 trade finance platforms</span>, aligning data flows with business processes and reducing post-deployment change requests by <span class="highlight">20%</span></li>
-                        <li>Authored <span class="highlight">50+ user stories</span> and acceptance criteria in Jira within an Agile environment, ensuring <span class="highlight">100% traceability</span> of business requirements to technical deliverables</li>
-                        <li>Developed and optimized SQL queries and Power BI dashboards to validate system data, presenting insights that informed a key customer retention strategy, impacting <span class="highlight">10,000+ clients</span></li>
-                        <li>Facilitated defect review meetings with <span class="highlight">10+ stakeholders</span>, prioritizing issues based on severity and business impact, which cut the average resolution time by <span class="highlight">15%</span></li>
-                        <li>Created and maintained a Business Glossary and Data Dictionary, improving data governance and cross-team understanding of key metrics</li>
-                    </ul>
-                    <div class="exp-tech">
-                        <span>Jira</span><span>SQL</span><span>Power BI</span><span>Agile</span><span>Requirements Analysis</span><span>Data Governance</span>
-                    </div>
-                </div>
-
-                <div class="exp-item">
-                    <div class="exp-header">
-                        <div>
-                            <h3>IT Technical Consultant</h3>
-                            <p class="company">MN Mkansi Inc</p>
-                        </div>
-                        <div class="exp-date"><i class="far fa-calendar-alt"></i> February 2019 - March 2021</div>
-                    </div>
-                    <ul class="exp-duties">
-                        <li>Redesigned and maintained the company website, improving page load speed by <span class="highlight">35%</span> and boosting SEO rankings, resulting in a <span class="highlight">25% increase in organic traffic</span></li>
-                        <li>Managed IT operations including software upgrades and network troubleshooting, achieving <span class="highlight">99.5% system uptime</span> and supporting a <span class="highlight">15% year-on-year business growth</span></li>
-                        <li>Authored and implemented SLAs for help desk functions, improving service resolution time by <span class="highlight">20%</span> and enhancing overall client satisfaction</li>
-                    </ul>
-                    <div class="exp-tech">
-                        <span>Web Development</span><span>SEO</span><span>Network Management</span><span>SLA Development</span><span>IT Operations</span>
-                    </div>
-                </div>
-
-                <div class="exp-item">
-                    <div class="exp-header">
-                        <div>
-                            <h3>Web Developer</h3>
-                            <p class="company">Kulani ICT Solutions</p>
-                        </div>
-                        <div class="exp-date"><i class="far fa-calendar-alt"></i> February 2018 - November 2018</div>
-                    </div>
-                    <ul class="exp-duties">
-                        <li>Developed <span class="highlight">10+ responsive websites</span> for small businesses using HTML, CSS, JavaScript, and Node.JS, enhancing client online presence and user engagement</li>
-                        <li>Refactored legacy code to modern frameworks, improving website functionality and maintainability for ongoing client use</li>
-                    </ul>
-                    <div class="exp-tech">
-                        <span>HTML/CSS</span><span>JavaScript</span><span>Node.JS</span><span>Responsive Design</span><span>Legacy Code Refactoring</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-  <!-- PROJECTS PAGE -->
-    <div id="projects" class="page">
-        <section class="personal-statement" style="padding-top: 120px;">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-tag">Recent Work</span>
-                    <h2>Side <span class="gradient-text">Projects</span></h2>
-                    <div class="section-divider"></div>
-                    <p class="section-subtitle">Passion projects and volunteer initiatives demonstrating my diverse capabilities</p>
-                </div>
-
-                <div class="projects-grid">
-                    <div class="project-card">
-                        <div class="project-badge freelance">Freelance</div>
-                        <h3>Web Design & Development</h3>
-                        <p class="project-date"><i class="far fa-calendar-alt"></i> August 2024 - October 2024</p>
-                        <p>Designed and developed responsive websites using HTML, CSS, JavaScript, and CMS platforms (WordPress). Enhanced UI/UX through modern design principles and optimized sites for performance and SEO. Built responsive, integrated websites, showcasing end-to-end solution delivery and stakeholder requirement gathering.</p>
-                        <div class="project-tech">
-                            <span>HTML/CSS</span><span>JavaScript</span><span>WordPress</span><span>UI/UX</span><span>SEO</span>
-                        </div>
-                    </div>
-
-                    <div class="project-card">
-                        <div class="project-badge freelance">Freelance</div>
-                        <h3>Website Upgrade & Optimization</h3>
-                        <p class="project-date"><i class="far fa-calendar-alt"></i> March 2025 - May 2025</p>
-                        <p>Upgraded legacy websites to modern frameworks, achieving <span class="highlight">40% improvement in load times</span> and full mobile responsiveness. Integrated advanced features including dynamic content management and enhanced security protocols, improving user experience and site scalability.</p>
-                        <div class="project-tech">
-                            <span>Framework Migration</span><span>Performance Optimization</span><span>Security</span><span>SEO</span>
-                        </div>
-                    </div>
-
-                    <div class="project-card">
-                        <div class="project-badge freelance">Freelance</div>
-                        <h3>ICT Lab Proposal Coordinator</h3>
-                        <p class="project-date"><i class="far fa-calendar-alt"></i> January 2026 - Current</p>
-                        <p>Spearheaded proposal for a new computer lab at Khulanolwazi Primary School, conducting comprehensive needs assessment and developing detailed project plan, budget, and funding strategy for <span class="highlight">30 workstations (ZAR 500k project)</span>. Presented proposal to school administration, securing stakeholder buy-in pending approval.</p>
-                        <div class="project-tech">
-                            <span>Project Planning</span><span>Budget Management</span><span>Stakeholder Engagement</span><span>Needs Assessment</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-
-   <!-- SKILLS PAGE -->
-<div id="skills" class="page">
-    <section class="personal-statement" style="padding-top: 120px;">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag">Expertise</span>
-                <h2>Technical <span class="gradient-text">Proficiencies</span></h2>
-                <div class="section-divider"></div>
-                <p class="section-subtitle">Comprehensive toolkit across Business Analysis, AI, Development, Testing, and Project Management</p>
-            </div>
-
-            <div class="skills-section">
-                
-                <!-- 📊 BUSINESS & TEST ANALYST -->
-                <div class="skill-category">
-                    <div class="category-header">
-                        <div class="category-icon"><i class="fas fa-chart-line"></i></div>
-                        <h2>📊 Business & Test Analyst</h2>
-                    </div>
-                    <div class="skill-table">
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Requirements & Documentation</div>
-                            <div class="skill-tags">
-                                <span>Jira</span><span>Confluence</span><span>MS Visio</span><span>Figma</span><span>Lucidchart</span><span>SharePoint</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Testing & QA</div>
-                            <div class="skill-tags">
-                                <span>Selenium</span><span>UAT</span><span>SIT</span><span>Batch Testing</span><span>Defect Tracking</span><span>Test Case Management</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Methodologies</div>
-                            <div class="skill-tags">
-                                <span>Agile (Scrum/Kanban)</span><span>Waterfall</span><span>BPMN</span><span>UML</span><span>SDLC</span><span>ITIL</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Business Analysis</div>
-                            <div class="skill-tags">
-                                <span>Gap Analysis</span><span>Feasibility Studies</span><span>Requirements Elicitation</span><span>Process Mapping (As-Is/To-Be)</span><span>MoSCoW</span><span>User Stories</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Data Validation</div>
-                            <div class="skill-tags">
-                                <span>SQL</span><span>Power Query</span><span>ETL Validation</span><span>Data Quality Dashboards</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 🤖 AI & DATA SCIENCE -->
-                <div class="skill-category">
-                    <div class="category-header">
-                        <div class="category-icon"><i class="fas fa-brain"></i></div>
-                        <h2>🤖 AI & Data Science</h2>
-                    </div>
-                    <div class="skill-table">
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Machine Learning & AI</div>
-                            <div class="skill-tags">
-                                <span>Azure ML</span><span>LLMs</span><span>NLP</span><span>PyTorch</span><span>Python</span><span>Cognitive Services</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Data Analytics</div>
-                            <div class="skill-tags">
-                                <span>Power BI</span><span>Tableau</span><span>QlikView</span><span>Python (Pandas/NumPy)</span><span>R</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Data Engineering</div>
-                            <div class="skill-tags">
-                                <span>Azure Data Factory</span><span>Databricks</span><span>Apache Spark</span><span>Hadoop</span><span>Airflow</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 💻 DEVELOPMENT + IT PROJECT MANAGEMENT -->
-                <div class="skill-category">
-                    <div class="category-header">
-                        <div class="category-icon"><i class="fas fa-code"></i></div>
-                        <h2>💻 Development & IT Project Management</h2>
-                    </div>
-                    <div class="skill-table">
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Frontend Development</div>
-                            <div class="skill-tags">
-                                <span>HTML5</span><span>CSS3</span><span>JavaScript (ES6+)</span><span>React</span><span>jQuery</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Backend Development</div>
-                            <div class="skill-tags">
-                                <span>Node.js</span><span>Python</span><span>Java</span><span>PHP</span><span>AWS Lambda</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Databases</div>
-                            <div class="skill-tags">
-                                <span>SQL Server</span><span>MySQL</span><span>Oracle</span><span>MariaDB</span><span>Amazon Redshift</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Version Control</div>
-                            <div class="skill-tags">
-                                <span>Git</span><span>GitHub</span><span>Azure DevOps</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">IT Project Management</div>
-                            <div class="skill-tags">
-                                <span>Project Planning & Scheduling</span><span>Resource Allocation</span><span>Risk Management</span><span>Budgeting & Cost Control</span>
-                                <span>Stakeholder Communication</span><span>Agile/Scrum Leadership</span><span>Sprint Planning</span><span>Burndown Charts</span>
-                                <span>Velocity Tracking</span><span>Cross-functional Team Leadership</span><span>Vendor Management</span><span>Quality Assurance Oversight</span>
-                                <span>Change Management</span><span>Release Management</span><span>Post-implementation Reviews</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ☁️ CLOUD PLATFORMS -->
-                <div class="skill-category">
-                    <div class="category-header">
-                        <div class="category-icon"><i class="fas fa-cloud"></i></div>
-                        <h2>☁️ Cloud Platforms</h2>
-                    </div>
-                    <div class="skill-table">
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Microsoft Azure</div>
-                            <div class="skill-tags">
-                                <span>Azure ML</span><span>Data Factory</span><span>Functions</span><span>Cognitive Services</span><span>DevOps</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">AWS</div>
-                            <div class="skill-tags">
-                                <span>Lambda</span><span>Redshift</span><span>EC2</span><span>S3</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Other</div>
-                            <div class="skill-tags">
-                                <span>Docker</span><span>Kubernetes</span><span>Postman</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 🛠️ TOOLS & FRAMEWORKS -->
-                <div class="skill-category">
-                    <div class="category-header">
-                        <div class="category-icon"><i class="fas fa-toolbox"></i></div>
-                        <h2>🛠️ Tools & Frameworks</h2>
-                    </div>
-                    <div class="skill-table">
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Project Management</div>
-                            <div class="skill-tags">
-                                <span>Jira</span><span>Confluence</span><span>MS Project</span><span>Trello</span><span>Kanban</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Testing</div>
-                            <div class="skill-tags">
-                                <span>Selenium</span><span>TestNG</span><span>JUnit</span><span>Postman</span><span>LoadRunner</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">Design & Prototyping</div>
-                            <div class="skill-tags">
-                                <span>Figma</span><span>Adobe Photoshop</span><span>MS Visio</span>
-                            </div>
-                        </div>
-                        <div class="skill-row">
-                            <div class="skill-cat-title">IDE & Notebooks</div>
-                            <div class="skill-tags">
-                                <span>VS Code</span><span>Eclipse</span><span>JupyterLab</span><span>Spyder</span><span>RStudio</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+        <div class="quick-replies" id="quickReplies">
+            <button data-question="skills">💡 Skills</button>
+            <button data-question="experience">💼 Experience</button>
+            <button data-question="certificates">🎓 Certificates</button>
+            <button data-question="projects">🚀 Projects</button>
+            <button data-question="education">📚 Education</button>
         </div>
-    </section>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Ask a question..." autocomplete="off">
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+    <!-- Toggle Button -->
+    <button class="chat-toggle" id="chatToggle" aria-label="Open AI Chat">
+        <span id="toggleIcon">💬</span>
+    </button>
 </div>
 
-    <!-- CONTACT PAGE -->
-    <div id="contact" class="page">
-        <section class="personal-statement" style="padding-top: 120px;">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-tag">Get in Touch</span>
-                    <h2>Let's Work <span class="gradient-text">Together</span></h2>
-                    <div class="section-divider"></div>
-                </div>
-
-                <div class="contact-section">
-                    <div class="contact-grid">
-                        <div class="contact-info">
-                            <h2>Contact Details</h2>
-                            <div class="contact-detail">
-                                <div class="contact-icon-wrapper"><i class="fas fa-phone-alt"></i></div>
-                                <div><strong>Phone</strong><p><a href="tel:0721749648">072 174 9648</a></p></div>
-                            </div>
-                            <div class="contact-detail">
-                                <div class="contact-icon-wrapper"><i class="fas fa-envelope"></i></div>
-                                <div><strong>Email</strong><p><a href="mailto:mkansi.sthembiso@gmail.com">mkansi.sthembiso@gmail.com</a></p></div>
-                            </div>
-                            <div class="contact-detail">
-                                <div class="contact-icon-wrapper"><i class="fas fa-map-marker-alt"></i></div>
-                                <div><strong>Location</strong><p>Johannesburg, South Africa <span class="relocate-badge">✓ Willing to relocate</span></p></div>
-                            </div>
-                            <div class="availability-status">
-                                <span class="status-dot"></span>
-                                <span>Currently open for opportunities</span>
-                                 <div class="social-icons">
-                            <a href="https://www.linkedin.com/in/sthembiso-mkansi" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>
-                                 <a href="https://github.com/SthembisoMkansi" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
-                            </div>
-                        </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-</main>
-
-<footer>
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <div class="logo">SM</div>
-                <p>Transforming ideas into impactful digital solutions.</p>
-                <p style="font-size: 0.8rem; margin-top: 0.5rem;">Business Analyst | AI Engineer | Test Analyst | IT Project Manager | Full-Stack Developer</p>
-            </div>
-            <div class="footer-links">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><button onclick="showPage('home')">Home</button></li>
-                    <li><button onclick="showPage('education')">Education</button></li>
-                    <li><button onclick="showPage('experience')">Experience</button></li>
-                    <li><button onclick="showPage('projects')">Projects</button></li>
-                    <li><button onclick="showPage('skills')">Skills</button></li>
-                    <li><button onclick="showPage('contact')">Contact</button></li>
-                </ul>
-            </div>
-                    <div class="footer-social">
-                        <h4>Connect</h4>
-                            <div class="social-icons">
-                                <a href="https://www.linkedin.com/in/sthembiso-mkansi" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>
-                                <a href="https://github.com/SthembisoMkansi" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
-                            </div>
-                        </div>
-                   </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Sthembiso Mkansi. Crafted with <i class="fas fa-heart"></i> in South Africa</p>
-        </div>
-    </div>
-</footer>
-
 <script>
-    // Typed Text Effect
-    const roles = ["Business Analyst", "Test Analyst", "Full-Stack Developer", "AI Engineer", "IT Project Manager"];
-    let roleIndex = 0, charIndex = 0, isDeleting = false;
-    const typedTextElement = document.getElementById('typedText');
+    (function() {
+        // ========== KNOWLEDGE BASE ==========
+        const knowledge = {
+            // Skills
+            skills: "Sthembiso has expertise in:\n• Business Analysis: Requirements elicitation, gap analysis, BPMN, UML, process mapping.\n• Data & AI: Machine Learning, NLP, LLM deployment (Azure ML), Python (PyTorch), Power BI, Tableau.\n• Development: Full-stack (JS, Node.JS, Python, HTML/CSS), databases (SQL, MySQL, Oracle).\n• Testing: UAT, SIT, Selenium, test case management, defect tracking (Jira).\n• Project Management: Agile (Scrum/Kanban), Waterfall, risk management, stakeholder communication.",
+            experience: "Sthembiso has 7+ years of IT experience. He is currently an IT Enabler at Edu Nova (Nov 2025–present). Previously he worked as a Test Analyst at African Bank (Aug 2023–May 2024), Junior Business Analyst at Absa Bank (Jul 2021–Nov 2022), IT Technical Consultant at MN Mkansi Inc (Feb 2019–Mar 2021), and Web Developer at Kulani ICT Solutions (Feb 2018–Nov 2018). He has delivered measurable impacts: 25% faster ETL, 98% defect detection, 15% improved AI predictions, and 40% website load time improvements.",
+            certificates: "Sthembiso holds:\n• Microsoft Certified: Azure AI Engineer Associate (Earned May 2022, expires May 2027)\n• Microsoft Certified: Azure AI Fundamentals (Earned Apr 2022)\n• Project Management Certificate from the National School of Government (Mar 2026) – part of the SMS Essentials Programme for middle/senior managers.",
+            projects: "Notable side projects:\n• Web Design & Development (Freelance, Aug–Oct 2024) – built responsive sites with HTML, CSS, JS, WordPress, improved SEO.\n• Website Upgrade & Optimization (Mar–May 2025) – upgraded legacy sites to modern frameworks, achieved 40% load time improvement.\n• ICT Lab Proposal Coordinator (Jan 2026–present) – developed a ZAR 500k proposal for a 30-workstation computer lab at Khulanolwazi Primary School, secured stakeholder buy-in.",
+            education: "Sthembiso holds a Bachelor of Information Technology in Business Systems from RoseBank College IIE (2016–2018) and a Diploma in Business Analysis from Gijima Training Institute (2021–2022).",
+            // Additional generic
+            hello: "Hi there! I'm here to help you learn about Sthembiso's background. You can ask about his skills, experience, certifications, projects, or education.",
+            default: "I'm not sure about that. Please ask about skills, experience, certificates, projects, or education. Or click one of the quick reply buttons!"
+        };
 
-    function typeEffect() {
-        if (!typedTextElement) return;
-        const currentRole = roles[roleIndex];
-        if (isDeleting) {
-            typedTextElement.textContent = currentRole.substring(0, charIndex - 1);
-            charIndex--;
-        } else {
-            typedTextElement.textContent = currentRole.substring(0, charIndex + 1);
-            charIndex++;
-        }
-        if (!isDeleting && charIndex === currentRole.length) {
-            isDeleting = true;
-            setTimeout(typeEffect, 2000);
-            return;
-        }
-        if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            roleIndex = (roleIndex + 1) % roles.length;
-        }
-        setTimeout(typeEffect, isDeleting ? 50 : 100);
-    }
-    typeEffect();
+        // ========== ELEMENTS ==========
+        const chatWindow = document.getElementById('chatWindow');
+        const chatToggle = document.getElementById('chatToggle');
+        const closeChat = document.getElementById('closeChat');
+        const chatBody = document.getElementById('chatBody');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const quickReplyBtns = document.querySelectorAll('.quick-replies button');
 
-    // Page Navigation
-    function showPage(pageId) {
-        document.querySelectorAll('.page').forEach(page => {
-            page.classList.remove('active-page');
+        let isOpen = false;
+        let isProcessing = false;
+
+        // ========== TOGGLE CHAT ==========
+        function toggleChat() {
+            isOpen = !isOpen;
+            chatWindow.classList.toggle('open', isOpen);
+            const icon = document.getElementById('toggleIcon');
+            icon.textContent = isOpen ? '✕' : '💬';
+            if (isOpen) {
+                chatInput.focus();
+                // Auto-scroll to bottom
+                setTimeout(scrollToBottom, 100);
+            }
+        }
+
+        chatToggle.addEventListener('click', toggleChat);
+        closeChat.addEventListener('click', toggleChat);
+
+        // ========== SCROLL TO BOTTOM ==========
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // ========== ADD MESSAGE ==========
+        function addMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            // Replace newlines with <br>
+            msgDiv.innerHTML = text.replace(/\n/g, '<br>');
+            // Insert before typing indicator
+            chatBody.insertBefore(msgDiv, typingIndicator);
+            scrollToBottom();
+        }
+
+        // ========== SHOW TYPING ==========
+        function showTyping(show) {
+            typingIndicator.style.display = show ? 'flex' : 'none';
+            if (show) scrollToBottom();
+        }
+
+        // ========== GET RESPONSE ==========
+        function getResponse(input) {
+            const lower = input.toLowerCase();
+            // Check for keywords
+            if (lower.includes('skill') || lower.includes('tool') || lower.includes('technology')) {
+                return knowledge.skills;
+            } else if (lower.includes('experience') || lower.includes('job') || lower.includes('work') || lower.includes('role') || lower.includes('position')) {
+                return knowledge.experience;
+            } else if (lower.includes('certif') || lower.includes('credential') || lower.includes('azure') || lower.includes('project management')) {
+                return knowledge.certificates;
+            } else if (lower.includes('project') || lower.includes('side') || lower.includes('freelance') || lower.includes('volunteer')) {
+                return knowledge.projects;
+            } else if (lower.includes('edu') || lower.includes('degree') || lower.includes('college') || lower.includes('university') || lower.includes('diploma')) {
+                return knowledge.education;
+            } else if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey')) {
+                return knowledge.hello;
+            } else {
+                return knowledge.default;
+            }
+        }
+
+        // ========== PROCESS USER INPUT ==========
+        function processUserInput(input) {
+            if (!input.trim()) return;
+            if (isProcessing) return;
+
+            // Add user message
+            addMessage(input.trim(), 'user');
+            chatInput.value = '';
+            isProcessing = true;
+            showTyping(true);
+
+            // Simulate thinking delay
+            setTimeout(() => {
+                const response = getResponse(input);
+                addMessage(response, 'bot');
+                showTyping(false);
+                isProcessing = false;
+                // Show quick replies again (they are always visible)
+            }, 600 + Math.random() * 400);
+        }
+
+        // ========== EVENT LISTENERS ==========
+        sendBtn.addEventListener('click', () => {
+            processUserInput(chatInput.value);
         });
-        document.getElementById(pageId).classList.add('active-page');
-        
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.getAttribute('data-page') === pageId) {
-                btn.classList.add('active');
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                processUserInput(chatInput.value);
             }
         });
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
 
-    // Attach navigation to all nav buttons
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            showPage(btn.getAttribute('data-page'));
-            document.querySelector('.nav-links').classList.remove('active');
+        quickReplyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const question = btn.getAttribute('data-question');
+                // Map to a friendly prompt
+                let prompt = '';
+                switch(question) {
+                    case 'skills': prompt = 'Tell me about your skills.'; break;
+                    case 'experience': prompt = 'What is your work experience?'; break;
+                    case 'certificates': prompt = 'What certifications do you have?'; break;
+                    case 'projects': prompt = 'What projects have you worked on?'; break;
+                    case 'education': prompt = 'What is your education background?'; break;
+                    default: prompt = question;
+                }
+                chatInput.value = prompt;
+                processUserInput(prompt);
+            });
         });
-    });
 
-    // Theme Toggle
-    const themeToggle = document.getElementById('themeToggle');
-    let isDark = true;
-    themeToggle.addEventListener('click', () => {
-        const root = document.documentElement;
-        if (isDark) {
-            root.style.setProperty('--bg-primary', '#f5f5f5');
-            root.style.setProperty('--bg-secondary', '#ffffff');
-            root.style.setProperty('--bg-card', '#ffffff');
-            root.style.setProperty('--text-primary', '#1a1a1a');
-            root.style.setProperty('--text-secondary', '#4a4a4a');
-            root.style.setProperty('--text-muted', '#8a8a8a');
-            root.style.setProperty('--border-light', 'rgba(0, 0, 0, 0.1)');
-            themeToggle.innerHTML = '☀️';
-        } else {
-            root.style.setProperty('--bg-primary', '#0a0a0a');
-            root.style.setProperty('--bg-secondary', '#111111');
-            root.style.setProperty('--bg-card', '#1a1a1a');
-            root.style.setProperty('--text-primary', '#ffffff');
-            root.style.setProperty('--text-secondary', '#a0a0a0');
-            root.style.setProperty('--text-muted', '#6b6b6b');
-            root.style.setProperty('--border-light', 'rgba(255, 255, 255, 0.08)');
-            themeToggle.innerHTML = '🌙';
-        }
-        isDark = !isDark;
-    });
+        // ========== INITIAL GREETING (if window opens) ==========
+        // Add a welcome after a short delay if chat opens first time?
+        // Already present in HTML.
 
-    // Mobile Menu Toggle
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    hamburger.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-    });
+        // ========== CLOSE CHAT ON OUTSIDE CLICK (optional) ==========
+        document.addEventListener('click', (e) => {
+            if (isOpen && !chatWindow.contains(e.target) && e.target !== chatToggle && !chatToggle.contains(e.target)) {
+                // Do not close automatically to avoid annoyance
+            }
+        });
+
+        console.log('🤖 AI Career Assistant loaded!');
+    })();
 </script>
-
-</body>
-</html>
+<!-- ===== END AI AGENT ===== -->
